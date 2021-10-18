@@ -17,22 +17,20 @@ func (c *RatingServiceCommander) Delete(inputMessage *tgbotapi.Message) {
 		return
 	}
 
+	product, err := c.serviceService.Get(idx)
+	if err != nil {
+		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
+		return
+	}
 	err = c.serviceService.Delete(idx)
 
-	msg := tgbotapi.MessageConfig{}
 	if err != nil {
-		log.Printf("fail to delete product with idx %d: %v", idx, err)
-		msg = tgbotapi.NewMessage(
-			inputMessage.Chat.ID,
-			fmt.Sprintf("fail to delete product with idx %d: %v", idx, err),
-		)
-	} else {
-		msg = tgbotapi.NewMessage(
-			inputMessage.Chat.ID,
-			fmt.Sprintf("delete product with idx %d: %v", idx, err),
-		)
+		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
 	}
-
+	msg := tgbotapi.NewMessage(
+		inputMessage.Chat.ID,
+		fmt.Sprintf("delete product with idx %d\n %s", idx, product),
+	)
 	_, err = c.bot.Send(msg)
 	if err != nil {
 		log.Println("error send message %s", err)

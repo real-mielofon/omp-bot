@@ -45,7 +45,23 @@ func (c *RatingServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPat
 		c.Delete(msg)
 	case "edit":
 		c.Edit(msg)
+	case "new":
+		c.New(msg)
 	default:
 		c.Default(msg)
+	}
+}
+
+func (c *RatingServiceCommander) sendError(str string, inputMessageID int64) {
+	log.Printf(str)
+	msg := tgbotapi.NewMessage(
+		inputMessageID,
+		str,
+	)
+
+	_, err := c.bot.Send(msg)
+	if err != nil {
+		log.Println("error send message %s", err)
+		return
 	}
 }
