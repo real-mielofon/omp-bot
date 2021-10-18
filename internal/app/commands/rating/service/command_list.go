@@ -1,4 +1,4 @@
-package subdomain
+package service
 
 import (
 	"encoding/json"
@@ -8,12 +8,12 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
-func (c *DemoSubdomainCommander) List(inputMessage *tgbotapi.Message) {
+func (c *RatingServiceCommander) List(inputMessage *tgbotapi.Message) {
 	outputMsgText := "Here all the products: \n\n"
 
-	products := c.subdomainService.List()
+	products := c.serviceService.List()
 	for _, p := range products {
-		outputMsgText += p.Title
+		outputMsgText += p.String()
 		outputMsgText += "\n"
 	}
 
@@ -38,6 +38,7 @@ func (c *DemoSubdomainCommander) List(inputMessage *tgbotapi.Message) {
 
 	_, err := c.bot.Send(msg)
 	if err != nil {
-		log.Printf("DemoSubdomainCommander.List: error sending reply message to chat - %v", err)
+		log.Println("error send message %s", err)
+		return
 	}
 }

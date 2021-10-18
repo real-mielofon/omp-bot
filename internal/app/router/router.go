@@ -5,8 +5,9 @@ import (
 	"runtime/debug"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/commands/demo"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/commands/demo"
+	"github.com/real-mielofon/omp-bot/internal/app/commands/rating"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type Commander interface {
@@ -40,6 +41,7 @@ type Router struct {
 	// exchange
 	// estate
 	// rating
+	ratingCommander Commander
 	// security
 	// cinema
 	// logistic
@@ -75,6 +77,7 @@ func NewRouter(
 		// exchange
 		// estate
 		// rating
+		ratingCommander: rating.NewRatingCommander(bot),
 		// security
 		// cinema
 		// logistic
