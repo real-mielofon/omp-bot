@@ -13,8 +13,11 @@ import (
 func (c *RatingServiceCommander) New(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 
+	helpNew := fmt.Sprintf("wrong args '%s'\n", args) +
+		fmt.Sprintf("need /new__rating_service {ServiceID} {Value} {ReviewsCount}'\n") +
+		fmt.Sprintf("example /new__rating_service 8 5 0'\n")
 	if args == "" {
-		c.sendError(fmt.Sprintf("empty args %s", args), inputMessage.Chat.ID)
+		c.sendError(helpNew, inputMessage.Chat.ID)
 		return
 	}
 
@@ -23,9 +26,7 @@ func (c *RatingServiceCommander) New(inputMessage *tgbotapi.Message) {
 		log.Println("wrong args", args)
 		msg := tgbotapi.NewMessage(
 			inputMessage.Chat.ID,
-			fmt.Sprintf("wrong args '%s'\n", args)+
-				fmt.Sprintf("need /new__rating_service {ServiceID, Value, RevieCount}'\n")+
-				fmt.Sprintf("example /new__rating_service 8, 5, 0'\n"),
+			helpNew,
 		)
 
 		_, err := c.bot.Send(msg)
@@ -60,7 +61,6 @@ func (c *RatingServiceCommander) New(inputMessage *tgbotapi.Message) {
 	product.Value = productValue
 	product.ReviewsCount = productReviewsCount
 	product.UpdatedTs = time.Unix(int64(inputMessage.Date), 0)
-	time.Now().Unix()
 
 	msg := tgbotapi.NewMessage(
 		inputMessage.Chat.ID,
