@@ -15,7 +15,7 @@ type CallbackListData struct {
 
 const itemsOnList = 10
 
-func (c *RatingServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *TheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	parsedData := CallbackListData{}
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
@@ -24,7 +24,7 @@ func (c *RatingServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, 
 
 		outputMsgText := "Here all the raitings: \n\n"
 
-		products := c.serviceService.List()
+		products := c.service.List()
 		for i, p := range products[parsedData.Offset : parsedData.Offset+itemsOnList+1] {
 			outputMsgText += fmt.Sprintf("%3d: %s\n", i+parsedData.Offset, p.String())
 		}

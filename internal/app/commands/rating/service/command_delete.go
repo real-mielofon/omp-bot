@@ -8,7 +8,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingServiceCommander) Delete(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) Delete(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 
 	idx, err := strconv.Atoi(args)
@@ -17,12 +17,12 @@ func (c *RatingServiceCommander) Delete(inputMessage *tgbotapi.Message) {
 		return
 	}
 
-	product, err := c.serviceService.Get(idx)
+	product, err := c.service.Get(idx)
 	if err != nil {
 		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
 		return
 	}
-	err = c.serviceService.Delete(idx)
+	err = c.service.Delete(idx)
 
 	if err != nil {
 		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)

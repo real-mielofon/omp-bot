@@ -8,32 +8,42 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/service/raiting/service"
 )
 
-type RatingServiceCommander struct {
-	bot            *tgbotapi.BotAPI
-	serviceService *service.ServiceService
+type ServiceCommander interface {
+	Help(inputMsg *tgbotapi.Message)
+	Get(inputMsg *tgbotapi.Message)
+	List(inputMsg *tgbotapi.Message)
+	Delete(inputMsg *tgbotapi.Message)
+
+	New(inputMsg *tgbotapi.Message)
+	Edit(inputMsg *tgbotapi.Message)
 }
 
-func NewRatingServiceCommander(
+type TheServiceCommander struct {
+	bot     *tgbotapi.BotAPI
+	service *service.Service
+}
+
+func NewTheServiceCommander(
 	bot *tgbotapi.BotAPI,
-) *RatingServiceCommander {
+) *TheServiceCommander {
 	serviceService := service.NewService()
 
-	return &RatingServiceCommander{
-		bot:            bot,
-		serviceService: serviceService,
+	return &TheServiceCommander{
+		bot:     bot,
+		service: serviceService,
 	}
 }
 
-func (c *RatingServiceCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *TheServiceCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	switch callbackPath.CallbackName {
 	case "list":
 		c.CallbackList(callback, callbackPath)
 	default:
-		log.Printf("RatingServiceCommander.HandleCallback: unknown callback name: %s", callbackPath.CallbackName)
+		log.Printf("TheServiceCommander.HandleCallback: unknown callback name: %s", callbackPath.CallbackName)
 	}
 }
 
-func (c *RatingServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
+func (c *TheServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
 	switch commandPath.CommandName {
 	case "help":
 		c.Help(msg)
@@ -52,7 +62,7 @@ func (c *RatingServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPat
 	}
 }
 
-func (c *RatingServiceCommander) sendError(str string, inputMessageID int64) {
+func (c *TheServiceCommander) sendError(str string, inputMessageID int64) {
 	log.Printf(str)
 	msg := tgbotapi.NewMessage(
 		inputMessageID,

@@ -24,7 +24,7 @@ func NewRatingCommander(
 ) *RatingCommander {
 	return &RatingCommander{
 		bot:              bot,
-		serviceCommander: service.NewRatingServiceCommander(bot),
+		serviceCommander: service.NewTheServiceCommander(bot),
 	}
 }
 

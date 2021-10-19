@@ -7,7 +7,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingServiceCommander) Get(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) Get(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 
 	idx, err := strconv.Atoi(args)
@@ -16,7 +16,7 @@ func (c *RatingServiceCommander) Get(inputMessage *tgbotapi.Message) {
 		return
 	}
 
-	product, err := c.serviceService.Get(idx)
+	product, err := c.service.Get(idx)
 	if err != nil {
 		log.Printf("fail to get product with idx %d: %v", idx, err)
 		return

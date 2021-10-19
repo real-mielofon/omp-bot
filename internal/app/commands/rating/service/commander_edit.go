@@ -10,7 +10,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingServiceCommander) Edit(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) Edit(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 	helpEdit := fmt.Sprintf("wrong args '%s'\n", args) +
 		fmt.Sprintf("need /edit__rating_service {idx} {ServiceID} {Value} {ReviewsCount}'\n") +
@@ -47,7 +47,7 @@ func (c *RatingServiceCommander) Edit(inputMessage *tgbotapi.Message) {
 		return
 	}
 
-	product, err := c.serviceService.Get(idx)
+	product, err := c.service.Get(idx)
 	if err != nil {
 		log.Printf("fail to get service with idx %d: %v", idx, err)
 		return

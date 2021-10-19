@@ -4,24 +4,24 @@ import (
 	"fmt"
 )
 
-type ServiceService struct{}
+type Service struct{}
 
-func NewService() *ServiceService {
-	return &ServiceService{}
+func NewService() *Service {
+	return &Service{}
 }
 
-func (s *ServiceService) List() []Service {
+func (s *Service) List() []Rating {
 	return allEntities
 }
 
-func (s *ServiceService) Get(idx int) (*Service, error) {
+func (s *Service) Get(idx int) (*Rating, error) {
 	if idx < 0 || idx >= len(allEntities) {
 		return nil, fmt.Errorf("Range check error idx: %d ", idx)
 	}
 	return &allEntities[idx], nil
 }
 
-func (s *ServiceService) Delete(idx int) error {
+func (s *Service) Delete(idx int) error {
 	if idx < 0 || idx >= len(allEntities) {
 		return fmt.Errorf("Range check error idx: %d ", idx)
 	}
@@ -29,8 +29,8 @@ func (s *ServiceService) Delete(idx int) error {
 	return nil
 }
 
-func (s *ServiceService) New() (*Service, error) {
-	allEntities = append(allEntities[:], Service{})
+func (s *Service) New() (*Rating, error) {
+	allEntities = append(allEntities[:], Rating{})
 	idx := len(allEntities) - 1
 
 	return &allEntities[idx], nil

@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func (c *RatingServiceCommander) Help(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) Help(inputMessage *tgbotapi.Message) {
 	msg := tgbotapi.NewMessage(inputMessage.Chat.ID,
 		"/help - help\n"+
 			"/list - list products\n"+

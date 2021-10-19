@@ -9,10 +9,10 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
-func (c *RatingServiceCommander) List(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) List(inputMessage *tgbotapi.Message) {
 	outputMsgText := "Here all the raitings: \n\n"
 
-	products := c.serviceService.List()
+	products := c.service.List()
 	for i, p := range products[:itemsOnList+1] {
 		outputMsgText += fmt.Sprintf("%3d: %s\n", i, p.String())
 	}

@@ -10,7 +10,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingServiceCommander) New(inputMessage *tgbotapi.Message) {
+func (c *TheServiceCommander) New(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 
 	helpNew := fmt.Sprintf("wrong args '%s'\n", args) +
@@ -52,7 +52,7 @@ func (c *RatingServiceCommander) New(inputMessage *tgbotapi.Message) {
 		return
 	}
 
-	product, err := c.serviceService.New()
+	product, err := c.service.New()
 	if err != nil {
 		log.Printf("error new product %v", err)
 		return
