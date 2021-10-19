@@ -1,9 +1,9 @@
-package rating
+package raiting
 
 import (
 	"log"
 
-	"github.com/real-mielofon/omp-bot/internal/app/commands/rating/service"
+	"github.com/real-mielofon/omp-bot/internal/app/commands/raiting/theService"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/real-mielofon/omp-bot/internal/app/path"
@@ -19,12 +19,12 @@ type RatingCommander struct {
 	serviceCommander Commander
 }
 
-func NewRatingCommander(
+func NewRaitingCommander(
 	bot *tgbotapi.BotAPI,
 ) *RatingCommander {
 	return &RatingCommander{
 		bot:              bot,
-		serviceCommander: service.NewTheServiceCommander(bot),
+		serviceCommander: theService.NewTheServiceCommander(bot),
 	}
 }
 
@@ -39,7 +39,7 @@ func (c *RatingCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callb
 
 func (c *RatingCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
 	switch commandPath.Subdomain {
-	case "service":
+	case "theservice":
 		c.serviceCommander.HandleCommand(msg, commandPath)
 	default:
 		log.Printf("DemoCommander.HandleCommand: unknown subdomain - %s", commandPath.Subdomain)

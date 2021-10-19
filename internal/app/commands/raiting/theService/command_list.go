@@ -1,4 +1,4 @@
-package service
+package theService
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
-func (c *TheServiceCommander) List(inputMessage *tgbotapi.Message) {
+func (c *RatingTheServiceCommander) List(inputMessage *tgbotapi.Message) {
 	outputMsgText := "Here all the raitings: \n\n"
 
 	products := c.service.List()
@@ -25,7 +25,7 @@ func (c *TheServiceCommander) List(inputMessage *tgbotapi.Message) {
 		})
 
 		callbackPath := path.CallbackPath{
-			Domain:       "rating",
+			Domain:       "raiting",
 			Subdomain:    "service",
 			CallbackName: "list",
 			CallbackData: string(serializedData),

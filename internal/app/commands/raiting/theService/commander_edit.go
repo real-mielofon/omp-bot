@@ -1,4 +1,4 @@
-package service
+package theService
 
 import (
 	"fmt"
@@ -10,11 +10,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *TheServiceCommander) Edit(inputMessage *tgbotapi.Message) {
+func (c *RatingTheServiceCommander) Edit(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 	helpEdit := fmt.Sprintf("wrong args '%s'\n", args) +
-		fmt.Sprintf("need /edit__rating_service {idx} {ServiceID} {Value} {ReviewsCount}'\n") +
-		fmt.Sprintf("example /edit__rating_service 5 8 5 0'\n")
+		fmt.Sprintf("need: /edit__raiting__thrservice {idx} {ServiceID} {Value} {ReviewsCount}\n") +
+		fmt.Sprintf("example: /edit__raiting__theservice 5 8 5 0\n")
 
 	if args == "" {
 		c.sendError(helpEdit, inputMessage.Chat.ID)

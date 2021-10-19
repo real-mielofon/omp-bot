@@ -1,4 +1,4 @@
-package service
+package theService
 
 import "github.com/real-mielofon/omp-bot/internal/model/raiting"
 
@@ -13,23 +13,23 @@ type ServiceService interface {
 type DummyServiceService struct{}
 
 func (d DummyServiceService) Describe(serviceID uint64) (*raiting.Service, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (d DummyServiceService) List(cursor uint64, limit uint64) ([]raiting.Service, error) {
-	panic("implement me")
+	return []raiting.Service{}, nil
 }
 
 func (d DummyServiceService) Create(service raiting.Service) (uint64, error) {
-	panic("implement me")
+	return 0, nil
 }
 
 func (d DummyServiceService) Update(serviceID uint64, service raiting.Service) error {
-	panic("implement me")
+	return nil
 }
 
 func (d DummyServiceService) Remove(serviceID uint64) (bool, error) {
-	panic("implement me")
+	return false, nil
 }
 
 func NewDummyServiceService() *DummyServiceService {

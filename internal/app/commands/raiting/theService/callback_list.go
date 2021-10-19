@@ -1,4 +1,4 @@
-package service
+package theService
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ type CallbackListData struct {
 
 const itemsOnList = 10
 
-func (c *TheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	parsedData := CallbackListData{}
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
@@ -37,7 +37,7 @@ func (c *TheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, cal
 				Offset: parsedData.Offset - itemsOnList,
 			})
 			callbackPath := path.CallbackPath{
-				Domain:       "rating",
+				Domain:       "raiting",
 				Subdomain:    "service",
 				CallbackName: "list",
 				CallbackData: string(serializedData),
@@ -51,7 +51,7 @@ func (c *TheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, cal
 				Offset: parsedData.Offset + itemsOnList,
 			})
 			callbackPath := path.CallbackPath{
-				Domain:       "rating",
+				Domain:       "raiting",
 				Subdomain:    "service",
 				CallbackName: "list",
 				CallbackData: string(serializedData),

@@ -1,36 +1,32 @@
-package service
+package theService
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *TheServiceCommander) Delete(inputMessage *tgbotapi.Message) {
+func (c *RatingTheServiceCommander) Get(inputMessage *tgbotapi.Message) {
 	args := inputMessage.CommandArguments()
 
 	idx, err := strconv.Atoi(args)
 	if err != nil {
-		log.Println("wrong args", args)
+		c.sendError("example: /get__raiting__theservice 0", inputMessage.Chat.ID)
 		return
 	}
 
 	product, err := c.service.Get(idx)
 	if err != nil {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
+		log.Printf("fail to get product with idx %d: %v", idx, err)
 		return
 	}
-	err = c.service.Delete(idx)
 
-	if err != nil {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
-	}
 	msg := tgbotapi.NewMessage(
 		inputMessage.Chat.ID,
-		fmt.Sprintf("delete product with idx %d\n %s", idx, product),
+		product.String(),
 	)
+
 	_, err = c.bot.Send(msg)
 	if err != nil {
 		log.Println("error send message %s", err)

@@ -1,11 +1,11 @@
-package service
+package theService
 
 import (
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/real-mielofon/omp-bot/internal/app/path"
-	"github.com/real-mielofon/omp-bot/internal/service/raiting/service"
+	"github.com/real-mielofon/omp-bot/internal/service/raiting/theService"
 )
 
 type ServiceCommander interface {
@@ -18,32 +18,32 @@ type ServiceCommander interface {
 	Edit(inputMsg *tgbotapi.Message)
 }
 
-type TheServiceCommander struct {
+type RatingTheServiceCommander struct {
 	bot     *tgbotapi.BotAPI
-	service *service.Service
+	service *theService.Service
 }
 
 func NewTheServiceCommander(
 	bot *tgbotapi.BotAPI,
-) *TheServiceCommander {
-	serviceService := service.NewService()
+) *RatingTheServiceCommander {
+	serviceService := theService.NewService()
 
-	return &TheServiceCommander{
+	return &RatingTheServiceCommander{
 		bot:     bot,
 		service: serviceService,
 	}
 }
 
-func (c *TheServiceCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingTheServiceCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	switch callbackPath.CallbackName {
 	case "list":
 		c.CallbackList(callback, callbackPath)
 	default:
-		log.Printf("TheServiceCommander.HandleCallback: unknown callback name: %s", callbackPath.CallbackName)
+		log.Printf("RatingTheServiceCommander.HandleCallback: unknown callback name: %s", callbackPath.CallbackName)
 	}
 }
 
-func (c *TheServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
+func (c *RatingTheServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
 	switch commandPath.CommandName {
 	case "help":
 		c.Help(msg)
@@ -62,7 +62,7 @@ func (c *TheServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath p
 	}
 }
 
-func (c *TheServiceCommander) sendError(str string, inputMessageID int64) {
+func (c *RatingTheServiceCommander) sendError(str string, inputMessageID int64) {
 	log.Printf(str)
 	msg := tgbotapi.NewMessage(
 		inputMessageID,
