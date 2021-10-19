@@ -1,4 +1,8 @@
 package raiting
 
-type Service struct {
+type TheService struct {
+}
+
+func (t TheService) String() string {
+	return "TheService"
 }

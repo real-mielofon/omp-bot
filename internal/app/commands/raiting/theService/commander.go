@@ -8,7 +8,7 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/service/raiting/theService"
 )
 
-type ServiceCommander interface {
+type TheServiceCommander interface {
 	Help(inputMsg *tgbotapi.Message)
 	Get(inputMsg *tgbotapi.Message)
 	List(inputMsg *tgbotapi.Message)
