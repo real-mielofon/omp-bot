@@ -5,8 +5,8 @@ import (
 	"log"
 )
 
-func (c *RatingTheServiceCommander) Help(inputMessage *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMessage.Chat.ID,
+func (c *RatingTheServiceCommander) Help(inputMsg *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID,
 		"/help__raiting__theservice - help\n"+
 			"/list__raiting__theservice - list products\n"+
 			"/get__raiting__theservice - get a entity\n"+

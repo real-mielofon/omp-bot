@@ -10,7 +10,7 @@ import (
 )
 
 type CallbackListData struct {
-	Offset int `json:"offset"`
+	Offset uint64 `json:"offset"`
 }
 
 const itemsOnList = 10
@@ -22,30 +22,36 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 		log.Printf("error json.Unmarshal %s", parsedData)
 	} else {
 
-		outputMsgText := "Here all the raitings: \n\n"
+		ratings, err := c.service.List(parsedData.Offset, itemsOnList)
+		if err != nil {
+			c.sendError(fmt.Sprintf("error json.Unmarshal %s", parsedData), callback.Message.Chat.ID)
+			return
+		}
 
-		products := c.service.List()
-		for i, p := range products[parsedData.Offset : parsedData.Offset+itemsOnList+1] {
-			outputMsgText += fmt.Sprintf("%3d: %s\n", i+parsedData.Offset, p.String())
+		outputMsgText := "Here all the raitings: \n\n"
+		for i, p := range ratings {
+			outputMsgText += fmt.Sprintf("%3d: %s\n", uint64(i)+parsedData.Offset, p.String())
 		}
 
 		msg := tgbotapi.NewMessage(callback.Message.Chat.ID, outputMsgText)
 		var buttons []tgbotapi.InlineKeyboardButton
-		if parsedData.Offset-itemsOnList >= 0 {
-			// Add Prev buttun
-			serializedData, _ := json.Marshal(CallbackListData{
-				Offset: parsedData.Offset - itemsOnList,
-			})
-			callbackPath := path.CallbackPath{
-				Domain:       "raiting",
-				Subdomain:    "service",
-				CallbackName: "list",
-				CallbackData: string(serializedData),
-			}
+		if int(parsedData.Offset)-itemsOnList >= 0 {
+			if _, err := c.service.Describe(parsedData.Offset - itemsOnList); err == nil {
+				// Add Prev buttun
+				serializedData, _ := json.Marshal(CallbackListData{
+					Offset: parsedData.Offset - itemsOnList,
+				})
+				callbackPath := path.CallbackPath{
+					Domain:       "raiting",
+					Subdomain:    "service",
+					CallbackName: "list",
+					CallbackData: string(serializedData),
+				}
 
-			buttons = append(buttons, tgbotapi.NewInlineKeyboardButtonData("Prev page", callbackPath.String()))
+				buttons = append(buttons, tgbotapi.NewInlineKeyboardButtonData("Prev page", callbackPath.String()))
+			}
 		}
-		if parsedData.Offset+itemsOnList < len(products) {
+		if _, err := c.service.Describe(parsedData.Offset + itemsOnList); err == nil {
 			// Add Next buttun
 			serializedData, _ := json.Marshal(CallbackListData{
 				Offset: parsedData.Offset + itemsOnList,
@@ -66,7 +72,7 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 			)
 		}
 
-		_, err := c.bot.Send(msg)
+		_, err = c.bot.Send(msg)
 		if err != nil {
 			log.Println("error send message %s", err)
 			return

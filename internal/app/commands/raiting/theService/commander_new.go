@@ -2,6 +2,7 @@ package theService
 
 import (
 	"fmt"
+	"github.com/real-mielofon/omp-bot/internal/service/raiting/theService"
 	"log"
 	"strconv"
 	"strings"
@@ -10,14 +11,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingTheServiceCommander) New(inputMessage *tgbotapi.Message) {
-	args := inputMessage.CommandArguments()
+func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
+	args := inputMsg.CommandArguments()
 
 	helpNew := fmt.Sprintf("wrong args '%s'\n", args) +
 		fmt.Sprintf("need: /new__raiting__theservice {ServiceID} {Value} {ReviewsCount}\n") +
 		fmt.Sprintf("example: /new__raiting__theservice 8 5 0\n")
 	if args == "" {
-		c.sendError(helpNew, inputMessage.Chat.ID)
+		c.sendError(helpNew, inputMsg.Chat.ID)
 		return
 	}
 
@@ -25,7 +26,7 @@ func (c *RatingTheServiceCommander) New(inputMessage *tgbotapi.Message) {
 	if len(parameters) != 3 {
 		log.Println("wrong args", args)
 		msg := tgbotapi.NewMessage(
-			inputMessage.Chat.ID,
+			inputMsg.Chat.ID,
 			helpNew,
 		)
 
@@ -36,35 +37,36 @@ func (c *RatingTheServiceCommander) New(inputMessage *tgbotapi.Message) {
 		}
 		return
 	}
-	productServiceId, err := strconv.Atoi(parameters[0])
+
+	raiting := theService.TheService{}
+	var err error
+	raiting.ServiceId, err = strconv.Atoi(parameters[0])
 	if err != nil {
-		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[0]), inputMessage.Chat.ID)
+		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[0]), inputMsg.Chat.ID)
 		return
 	}
-	productValue, err := strconv.Atoi(parameters[1])
+	raiting.Value, err = strconv.Atoi(parameters[1])
 	if err != nil {
-		c.sendError(fmt.Sprintf("error Value value: %s", parameters[1]), inputMessage.Chat.ID)
+		c.sendError(fmt.Sprintf("error Value value: %s", parameters[1]), inputMsg.Chat.ID)
 		return
 	}
-	productReviewsCount, err := strconv.Atoi(parameters[2])
+	raiting.ReviewsCount, err = strconv.Atoi(parameters[2])
 	if err != nil {
-		c.sendError(fmt.Sprintf("error ReviewsCount value: %s", parameters[2]), inputMessage.Chat.ID)
+		c.sendError(fmt.Sprintf("error ReviewsCount value: %s", parameters[2]), inputMsg.Chat.ID)
 		return
 	}
 
-	product, err := c.service.New()
+	raiting.UpdatedTs = time.Unix(int64(inputMsg.Date), 0)
+
+	idx, err := c.service.Create(raiting)
 	if err != nil {
-		log.Printf("error new product %v", err)
+		c.sendError(fmt.Sprintf("error new product %v", err), inputMsg.Chat.ID)
 		return
 	}
-	product.ServiceId = productServiceId
-	product.Value = productValue
-	product.ReviewsCount = productReviewsCount
-	product.UpdatedTs = time.Unix(int64(inputMessage.Date), 0)
 
 	msg := tgbotapi.NewMessage(
-		inputMessage.Chat.ID,
-		product.String(),
+		inputMsg.Chat.ID,
+		fmt.Sprintf("%d: %s", idx, raiting.String()),
 	)
 
 	_, err = c.bot.Send(msg)

@@ -9,19 +9,20 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
-func (c *RatingTheServiceCommander) List(inputMessage *tgbotapi.Message) {
-	outputMsgText := "Here all the raitings: \n\n"
+func (c *RatingTheServiceCommander) List(inputMsg *tgbotapi.Message) {
+	outputMsgText := "Here all the ratings: \n\n"
 
-	products := c.service.List()
-	for i, p := range products[:itemsOnList+1] {
+	ratings, err := c.service.List(0, itemsOnList)
+
+	for i, p := range ratings {
 		outputMsgText += fmt.Sprintf("%3d: %s\n", i, p.String())
 	}
 
-	msg := tgbotapi.NewMessage(inputMessage.Chat.ID, outputMsgText)
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, outputMsgText)
 
-	if len(products) > itemsOnList {
+	if _, err := c.service.Describe(itemsOnList); err == nil {
 		serializedData, _ := json.Marshal(CallbackListData{
-			Offset: itemsOnList + 1,
+			Offset: itemsOnList,
 		})
 
 		callbackPath := path.CallbackPath{
@@ -38,7 +39,7 @@ func (c *RatingTheServiceCommander) List(inputMessage *tgbotapi.Message) {
 		)
 	}
 
-	_, err := c.bot.Send(msg)
+	_, err = c.bot.Send(msg)
 	if err != nil {
 		log.Println("error send message %s", err)
 		return

@@ -8,29 +8,19 @@ import (
 	"github.com/real-mielofon/omp-bot/internal/service/raiting/theService"
 )
 
-type TheServiceCommander interface {
-	Help(inputMsg *tgbotapi.Message)
-	Get(inputMsg *tgbotapi.Message)
-	List(inputMsg *tgbotapi.Message)
-	Delete(inputMsg *tgbotapi.Message)
-
-	New(inputMsg *tgbotapi.Message)
-	Edit(inputMsg *tgbotapi.Message)
-}
-
 type RatingTheServiceCommander struct {
 	bot     *tgbotapi.BotAPI
-	service *theService.Service
+	service *theService.DummyServiceService
 }
 
 func NewTheServiceCommander(
 	bot *tgbotapi.BotAPI,
 ) *RatingTheServiceCommander {
-	serviceService := theService.NewService()
+	service := theService.NewDummyTheServiceService()
 
 	return &RatingTheServiceCommander{
 		bot:     bot,
-		service: serviceService,
+		service: service,
 	}
 }
 

@@ -8,28 +8,27 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingTheServiceCommander) Delete(inputMessage *tgbotapi.Message) {
-	args := inputMessage.CommandArguments()
+func (c *RatingTheServiceCommander) Delete(inputMsg *tgbotapi.Message) {
+	args := inputMsg.CommandArguments()
 
 	idx, err := strconv.Atoi(args)
 	if err != nil {
-		c.sendError("example: /delete__raiting__theservice 0", inputMessage.Chat.ID)
+		c.sendError("example: /delete__raiting__theservice 0", inputMsg.Chat.ID)
 		return
 	}
 
-	product, err := c.service.Get(idx)
+	rating, err := c.service.Describe(uint64(idx))
 	if err != nil {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
+		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 		return
 	}
-	err = c.service.Delete(idx)
-
-	if err != nil {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMessage.Chat.ID)
+	result, err := c.service.Remove(uint64(idx))
+	if !result {
+		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 	}
 	msg := tgbotapi.NewMessage(
-		inputMessage.Chat.ID,
-		fmt.Sprintf("delete product with idx %d\n %s", idx, product),
+		inputMsg.Chat.ID,
+		fmt.Sprintf("delete product with idx %d\n %s", idx, rating),
 	)
 	_, err = c.bot.Send(msg)
 	if err != nil {
