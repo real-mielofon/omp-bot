@@ -66,9 +66,9 @@ func (s *DummyServiceService) Create(r TheService) (uint64, error) {
 }
 
 func (s *DummyServiceService) init() {
-	s.Create(TheService{ServiceId: 1, Value: 5, UpdatedTs: timeToStr("2 January 2012 15:04")})
-	s.Create(TheService{ServiceId: 1, Value: 5, UpdatedTs: timeToStr("2 January 2012 15:04")})
-	s.Create(TheService{ServiceId: 2, Value: 4, UpdatedTs: timeToStr("3 January 2012 15:04")})
+	_, _ = s.Create(TheService{ServiceId: 1, Value: 5, UpdatedTs: strToTime("2 January 2012 15:04")})
+	_, _ = s.Create(TheService{ServiceId: 1, Value: 5, UpdatedTs: strToTime("2 January 2012 15:04")})
+	_, _ = s.Create(TheService{ServiceId: 2, Value: 4, UpdatedTs: strToTime("3 January 2012 15:04")})
 
 	for i := 0; i < 30; i++ {
 		r := TheService{
@@ -78,11 +78,11 @@ func (s *DummyServiceService) init() {
 				2017+rand.Intn(5), time.Month(rand.Intn(12)+1), rand.Intn(29)+1,
 				rand.Intn(24), rand.Intn(60), rand.Intn(60), 0, time.UTC),
 		}
-		s.Create(r)
+		_, _ = s.Create(r)
 	}
 }
 
-func timeToStr(s string) (t time.Time) {
+func strToTime(s string) (t time.Time) {
 	t, _ = time.Parse(DateLayout, s)
 	return t
 }
