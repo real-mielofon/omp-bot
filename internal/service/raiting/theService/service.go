@@ -25,7 +25,7 @@ func NewDummyTheServiceService() *DummyServiceService {
 }
 
 func (s *DummyServiceService) List(cursor uint64, limit uint64) ([]TheService, error) {
-	if cursor < 0 || int(cursor) >= len(s.allEntities) {
+	if int(cursor) >= len(s.allEntities) {
 		return nil, fmt.Errorf("Range check error idx: %d ", cursor)
 	}
 	last := int(cursor + limit)
@@ -36,14 +36,14 @@ func (s *DummyServiceService) List(cursor uint64, limit uint64) ([]TheService, e
 }
 
 func (s *DummyServiceService) Describe(serviceID uint64) (*TheService, error) {
-	if serviceID < 0 || int(serviceID) > len(s.allEntities)-1 {
+	if int(serviceID) > len(s.allEntities)-1 {
 		return nil, fmt.Errorf("Range check error idx: %d ", serviceID)
 	}
 	return &s.allEntities[serviceID], nil
 }
 
 func (s *DummyServiceService) Update(serviceID uint64, service TheService) error {
-	if serviceID < 0 || int(serviceID) >= len(s.allEntities) {
+	if int(serviceID) >= len(s.allEntities) {
 		return fmt.Errorf("Range check error idx: %d ", serviceID)
 	}
 	s.allEntities[serviceID] = service
@@ -51,7 +51,7 @@ func (s *DummyServiceService) Update(serviceID uint64, service TheService) error
 }
 
 func (s *DummyServiceService) Remove(serviceID uint64) (bool, error) {
-	if serviceID < 0 || int(serviceID) >= len(s.allEntities) {
+	if int(serviceID) >= len(s.allEntities) {
 		return false, fmt.Errorf("Range check error idx: %d ", serviceID)
 	}
 	s.allEntities = append(s.allEntities[0:serviceID], s.allEntities[serviceID+1:]...)

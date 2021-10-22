@@ -32,7 +32,7 @@ func (c *RatingTheServiceCommander) Delete(inputMsg *tgbotapi.Message) {
 	)
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 }

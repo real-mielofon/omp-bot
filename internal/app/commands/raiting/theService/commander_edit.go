@@ -14,8 +14,8 @@ import (
 func (c *RatingTheServiceCommander) Edit(inputMsg *tgbotapi.Message) {
 	args := inputMsg.CommandArguments()
 	helpEdit := fmt.Sprintf("wrong args '%s'\n", args) +
-		fmt.Sprintf("need: /edit__raiting__thrservice {idx} {ServiceID} {Value} {ReviewsCount}\n") +
-		fmt.Sprintf("example: /edit__raiting__theservice 5 8 5 0\n")
+		"need: /edit__raiting__thrservice {idx} {ServiceID} {Value} {ReviewsCount}\n" +
+		"example: /edit__raiting__theservice 5 8 5 0\n"
 
 	if args == "" {
 		c.sendError(helpEdit, inputMsg.Chat.ID)
@@ -63,7 +63,7 @@ func (c *RatingTheServiceCommander) Edit(inputMsg *tgbotapi.Message) {
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 }

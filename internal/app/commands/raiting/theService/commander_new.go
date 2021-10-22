@@ -15,8 +15,8 @@ func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
 	args := inputMsg.CommandArguments()
 
 	helpNew := fmt.Sprintf("wrong args '%s'\n", args) +
-		fmt.Sprintf("need: /new__raiting__theservice {ServiceID} {Value} {ReviewsCount}\n") +
-		fmt.Sprintf("example: /new__raiting__theservice 8 5 0\n")
+		"need: /new__raiting__theservice {ServiceID} {Value} {ReviewsCount}\n" +
+		"example: /new__raiting__theservice 8 5 0\n"
 	if args == "" {
 		c.sendError(helpNew, inputMsg.Chat.ID)
 		return
@@ -32,7 +32,7 @@ func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
 
 		_, err := c.bot.Send(msg)
 		if err != nil {
-			log.Println("error send message %s", err)
+			log.Printf("error send message %s", err)
 			return
 		}
 		return
@@ -71,7 +71,7 @@ func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 }

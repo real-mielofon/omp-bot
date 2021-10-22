@@ -19,13 +19,13 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 	parsedData := CallbackListData{}
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
-		log.Printf("error json.Unmarshal %s", parsedData)
+		log.Printf("error json.Unmarshal %+v", parsedData)
 		return
 	}
 
 	ratings, err := c.service.List(parsedData.Offset, itemsOnList)
 	if err != nil {
-		c.sendError(fmt.Sprintf("error json.Unmarshal %s", parsedData), callback.Message.Chat.ID)
+		c.sendError(fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
 		return
 	}
 
@@ -75,14 +75,14 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 	_, err = c.bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: callback.ID,
 	})
 	if err != nil {
-		log.Println("error AnswerCallbackQuery %s", err)
+		log.Printf("error AnswerCallbackQuery %s", err)
 		return
 	}
 }

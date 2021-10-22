@@ -53,7 +53,7 @@ func (c *RatingTheServiceCommander) HandleCommand(msg *tgbotapi.Message, command
 }
 
 func (c *RatingTheServiceCommander) sendError(str string, inputMessageID int64) {
-	log.Printf(str)
+	log.Println(str)
 	msg := tgbotapi.NewMessage(
 		inputMessageID,
 		str,
@@ -61,7 +61,7 @@ func (c *RatingTheServiceCommander) sendError(str string, inputMessageID int64) 
 
 	_, err := c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 }

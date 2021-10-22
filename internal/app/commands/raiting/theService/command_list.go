@@ -13,6 +13,10 @@ func (c *RatingTheServiceCommander) List(inputMsg *tgbotapi.Message) {
 	outputMsgText := "Here all the ratings: \n\n"
 
 	ratings, err := c.service.List(0, itemsOnList)
+	if err != nil {
+		log.Printf("error c.service.List %s", err)
+		return
+	}
 
 	for i, p := range ratings {
 		outputMsgText += fmt.Sprintf("%3d: %s\n", i, p.String())
@@ -41,7 +45,7 @@ func (c *RatingTheServiceCommander) List(inputMsg *tgbotapi.Message) {
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Println("error send message %s", err)
+		log.Printf("error send message %s", err)
 		return
 	}
 }
