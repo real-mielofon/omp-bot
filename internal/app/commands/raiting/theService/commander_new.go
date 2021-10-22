@@ -2,7 +2,7 @@ package theService
 
 import (
 	"fmt"
-	"github.com/real-mielofon/omp-bot/internal/service/raiting/theService"
+	"github.com/ozonmp/omp-bot/internal/service/raiting/theService"
 	"log"
 	"strconv"
 	"strings"

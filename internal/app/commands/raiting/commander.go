@@ -3,10 +3,10 @@ package raiting
 import (
 	"log"
 
-	"github.com/real-mielofon/omp-bot/internal/app/commands/raiting/theService"
+	"github.com/ozonmp/omp-bot/internal/app/commands/raiting/theService"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/real-mielofon/omp-bot/internal/app/path"
+	"github.com/ozonmp/omp-bot/internal/app/path"
 )
 
 type Commander interface {
