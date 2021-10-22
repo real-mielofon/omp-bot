@@ -5,7 +5,6 @@ import (
 	"runtime/debug"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/commands/demo"
 	"github.com/ozonmp/omp-bot/internal/app/commands/raiting"
 	"github.com/ozonmp/omp-bot/internal/app/path"
 )
@@ -56,7 +55,6 @@ func NewRouter(
 		// bot
 		bot: bot,
 		// demoCommander
-		demoCommander: demo.NewDemoCommander(bot),
 		// user
 		// access
 		// buy
