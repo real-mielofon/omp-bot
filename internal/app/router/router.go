@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/commands/demo"
+	"github.com/ozonmp/omp-bot/internal/app/commands/raiting"
 	"github.com/ozonmp/omp-bot/internal/app/path"
 )
 
@@ -39,7 +39,8 @@ type Router struct {
 	// service
 	// exchange
 	// estate
-	// rating
+	// raiting
+	raitingCommander Commander
 	// security
 	// cinema
 	// logistic
@@ -54,7 +55,6 @@ func NewRouter(
 		// bot
 		bot: bot,
 		// demoCommander
-		demoCommander: demo.NewDemoCommander(bot),
 		// user
 		// access
 		// buy
@@ -74,7 +74,8 @@ func NewRouter(
 		// service
 		// exchange
 		// estate
-		// rating
+		// raiting
+		raitingCommander: raiting.NewRaitingCommander(bot),
 		// security
 		// cinema
 		// logistic
@@ -146,8 +147,8 @@ func (c *Router) handleCallback(callback *tgbotapi.CallbackQuery) {
 		break
 	case "estate":
 		break
-	case "rating":
-		break
+	case "raiting":
+		c.raitingCommander.HandleCallback(callback, callbackPath)
 	case "security":
 		break
 	case "cinema":
@@ -217,8 +218,8 @@ func (c *Router) handleMessage(msg *tgbotapi.Message) {
 		break
 	case "estate":
 		break
-	case "rating":
-		break
+	case "raiting":
+		c.raitingCommander.HandleCommand(msg, commandPath)
 	case "security":
 		break
 	case "cinema":
