@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package ozonmp.rtg_service_facade.v1;
+
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ozonmp/rtg-service-facade/pkg/rtg-service-facade;rtg_service_facade";
+
+// RtgServiceApiService - Service for working with services
+service RtgServiceFacadeService {
+  // ListServices
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
+    option (google.api.http) = {
+      get: "/ListServices"
+    };
+  }
+  rpc ListAllServices(ListAllServicesRequest) returns (ListAllServicesResponse) {
+    option (google.api.http) = {
+      get: "/ListAllServices"
+    };
+  }
+}
+
+message Service {
+  uint64 id  = 1;
+  uint64 value = 2;
+  google.protobuf.Timestamp updated_ts = 3;
+  uint64 reviews_count = 4;
+}
+
+message ListServicesRequest {
+  uint64 limit = 1;
+  uint64 cursor = 2;
+}
+
+message ListServicesResponse {
+  repeated Service services = 1;
+}
+
+message ListAllServicesRequest {
+
+}
+
+message ListAllServicesResponse {
+  repeated Service services = 1;
+}
+

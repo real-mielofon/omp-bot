@@ -1,12 +1,14 @@
 package router
 
 import (
+	"github.com/real-mielofon/omp-bot/internal/service/raiting"
 	"log"
 	"runtime/debug"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/commands/raiting"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	commandRaiting "github.com/real-mielofon/omp-bot/internal/app/commands/raiting"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type Commander interface {
@@ -50,6 +52,8 @@ type Router struct {
 
 func NewRouter(
 	bot *tgbotapi.BotAPI,
+	rtgService raiting.TheServiceService,
+	timeOut time.Duration,
 ) *Router {
 	return &Router{
 		// bot
@@ -75,7 +79,7 @@ func NewRouter(
 		// exchange
 		// estate
 		// raiting
-		raitingCommander: raiting.NewRaitingCommander(bot),
+		raitingCommander: commandRaiting.NewRaitingCommander(bot, rtgService, timeOut),
 		// security
 		// cinema
 		// logistic

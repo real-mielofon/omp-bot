@@ -1,26 +1,30 @@
 package theService
 
 import (
+	"github.com/real-mielofon/omp-bot/internal/service/raiting"
 	"log"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
-	"github.com/ozonmp/omp-bot/internal/service/raiting/theService"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type RatingTheServiceCommander struct {
-	bot     *tgbotapi.BotAPI
-	service *theService.DummyServiceService
+	bot        *tgbotapi.BotAPI
+	rtgService raiting.TheServiceService
+	timeout    time.Duration
 }
 
 func NewTheServiceCommander(
 	bot *tgbotapi.BotAPI,
+	rtgService raiting.TheServiceService,
+	timeout time.Duration,
 ) *RatingTheServiceCommander {
-	service := theService.NewDummyTheServiceService()
 
 	return &RatingTheServiceCommander{
-		bot:     bot,
-		service: service,
+		bot:        bot,
+		rtgService: rtgService,
+		timeout:    timeout,
 	}
 }
 

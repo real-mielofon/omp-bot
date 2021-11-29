@@ -1,12 +1,14 @@
 package raiting
 
 import (
+	"github.com/real-mielofon/omp-bot/internal/service/raiting"
 	"log"
+	"time"
 
-	"github.com/ozonmp/omp-bot/internal/app/commands/raiting/theService"
+	"github.com/real-mielofon/omp-bot/internal/app/commands/raiting/theService"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type Commander interface {
@@ -21,10 +23,12 @@ type RatingCommander struct {
 
 func NewRaitingCommander(
 	bot *tgbotapi.BotAPI,
+	rtgService raiting.TheServiceService,
+	timeout time.Duration,
 ) *RatingCommander {
 	return &RatingCommander{
 		bot:              bot,
-		serviceCommander: theService.NewTheServiceCommander(bot),
+		serviceCommander: theService.NewTheServiceCommander(bot, rtgService, timeout),
 	}
 }
 

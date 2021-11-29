@@ -1,12 +1,13 @@
 package theService
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type CallbackListData struct {
@@ -23,7 +24,10 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 		return
 	}
 
-	ratings, err := c.service.List(parsedData.Offset, itemsOnList)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+
+	ratings, err := c.rtgService.List(ctx, parsedData.Offset, itemsOnList)
 	if err != nil {
 		c.sendError(fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
 		return
@@ -36,8 +40,11 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	msg := tgbotapi.NewMessage(callback.Message.Chat.ID, outputMsgText)
 	var buttons []tgbotapi.InlineKeyboardButton
+	ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
 	if int(parsedData.Offset)-itemsOnList >= 0 {
-		if _, err := c.service.Describe(parsedData.Offset - itemsOnList); err == nil {
+
+		if _, err := c.rtgService.Describe(ctx, parsedData.Offset-itemsOnList); err == nil {
 			// Add Prev buttun
 			serializedData, _ := json.Marshal(CallbackListData{
 				Offset: parsedData.Offset - itemsOnList,
@@ -52,7 +59,7 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 			buttons = append(buttons, tgbotapi.NewInlineKeyboardButtonData("Prev page", callbackPath.String()))
 		}
 	}
-	if _, err := c.service.Describe(parsedData.Offset + itemsOnList); err == nil {
+	if _, err := c.rtgService.Describe(ctx, parsedData.Offset+itemsOnList); err == nil {
 		// Add Next buttun
 		serializedData, _ := json.Marshal(CallbackListData{
 			Offset: parsedData.Offset + itemsOnList,

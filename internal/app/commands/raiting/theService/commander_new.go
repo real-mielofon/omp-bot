@@ -1,8 +1,9 @@
 package theService
 
 import (
+	"context"
 	"fmt"
-	"github.com/ozonmp/omp-bot/internal/service/raiting/theService"
+	"github.com/real-mielofon/omp-bot/internal/model/raiting"
 	"log"
 	"strconv"
 	"strings"
@@ -38,27 +39,37 @@ func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
 		return
 	}
 
-	raiting := theService.TheService{}
+	service := raiting.TheService{}
 	var err error
-	raiting.ServiceId, err = strconv.Atoi(parameters[0])
+
+	id, err := strconv.Atoi(parameters[0])
 	if err != nil {
-		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[0]), inputMsg.Chat.ID)
+		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[1]), inputMsg.Chat.ID)
 		return
 	}
-	raiting.Value, err = strconv.Atoi(parameters[1])
+	if id < 0 {
+		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[1]), inputMsg.Chat.ID)
+		return
+	}
+	service.ID = uint64(id)
+
+	service.Value, err = strconv.Atoi(parameters[1])
+
 	if err != nil {
 		c.sendError(fmt.Sprintf("error Value value: %s", parameters[1]), inputMsg.Chat.ID)
 		return
 	}
-	raiting.ReviewsCount, err = strconv.Atoi(parameters[2])
+	service.ReviewsCount, err = strconv.Atoi(parameters[2])
 	if err != nil {
 		c.sendError(fmt.Sprintf("error ReviewsCount value: %s", parameters[2]), inputMsg.Chat.ID)
 		return
 	}
 
-	raiting.UpdatedTs = time.Unix(int64(inputMsg.Date), 0)
+	service.UpdatedTs = time.Unix(int64(inputMsg.Date), 0)
 
-	idx, err := c.service.Create(raiting)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	idx, err := c.rtgService.Create(ctx, service)
 	if err != nil {
 		c.sendError(fmt.Sprintf("error new product %v", err), inputMsg.Chat.ID)
 		return
@@ -66,7 +77,7 @@ func (c *RatingTheServiceCommander) New(inputMsg *tgbotapi.Message) {
 
 	msg := tgbotapi.NewMessage(
 		inputMsg.Chat.ID,
-		fmt.Sprintf("%d: %s", idx, raiting.String()),
+		fmt.Sprintf("%d: %s", idx, service.String()),
 	)
 
 	_, err = c.bot.Send(msg)

@@ -1,18 +1,22 @@
 package theService
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 func (c *RatingTheServiceCommander) List(inputMsg *tgbotapi.Message) {
 	outputMsgText := "Here all the ratings: \n\n"
 
-	ratings, err := c.service.List(0, itemsOnList)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+
+	ratings, err := c.rtgService.List(ctx, 0, itemsOnList)
 	if err != nil {
 		log.Printf("error c.service.List %s", err)
 		return
@@ -24,7 +28,9 @@ func (c *RatingTheServiceCommander) List(inputMsg *tgbotapi.Message) {
 
 	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, outputMsgText)
 
-	if _, err := c.service.Describe(itemsOnList); err == nil {
+	ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	if _, err := c.rtgService.Describe(ctx, itemsOnList); err == nil {
 		serializedData, _ := json.Marshal(CallbackListData{
 			Offset: itemsOnList,
 		})

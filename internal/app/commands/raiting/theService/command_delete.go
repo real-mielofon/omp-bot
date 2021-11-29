@@ -1,6 +1,7 @@
 package theService
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -17,12 +18,17 @@ func (c *RatingTheServiceCommander) Delete(inputMsg *tgbotapi.Message) {
 		return
 	}
 
-	rating, err := c.service.Describe(uint64(idx))
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	rating, err := c.rtgService.Describe(ctx, uint64(idx))
 	if err != nil {
 		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 		return
 	}
-	result, err := c.service.Remove(uint64(idx))
+
+	ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	result, err := c.rtgService.Remove(ctx, uint64(idx))
 	if !result {
 		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 	}

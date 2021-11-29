@@ -1,9 +1,10 @@
 package theService
 
 import (
+	"context"
 	"fmt"
-	"github.com/ozonmp/omp-bot/internal/service/raiting/theService"
-	"log"
+	"github.com/real-mielofon/omp-bot/internal/model/raiting"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 	"strconv"
 	"strings"
 	"time"
@@ -32,38 +33,46 @@ func (c *RatingTheServiceCommander) Edit(inputMsg *tgbotapi.Message) {
 		c.sendError(fmt.Sprintf("error idx value: %s", parameters[0]), inputMsg.Chat.ID)
 		return
 	}
-	raiting := theService.TheService{}
-	raiting.ServiceId, err = strconv.Atoi(parameters[1])
+	service := raiting.TheService{}
+	id, err := strconv.Atoi(parameters[1])
 	if err != nil {
 		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[1]), inputMsg.Chat.ID)
 		return
 	}
-	raiting.Value, err = strconv.Atoi(parameters[2])
+	if id < 0 {
+		c.sendError(fmt.Sprintf("error ServiceId value: %s", parameters[1]), inputMsg.Chat.ID)
+		return
+	}
+	service.ID = uint64(id)
+
+	service.Value, err = strconv.Atoi(parameters[2])
 	if err != nil {
 		c.sendError(fmt.Sprintf("error Value value: %s", parameters[2]), inputMsg.Chat.ID)
 		return
 	}
-	raiting.ReviewsCount, err = strconv.Atoi(parameters[3])
+	service.ReviewsCount, err = strconv.Atoi(parameters[3])
 	if err != nil {
 		c.sendError(fmt.Sprintf("error ReviewsCount value: %s", parameters[3]), inputMsg.Chat.ID)
 		return
 	}
 
-	err = c.service.Update(uint64(idx), raiting)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	err = c.rtgService.Update(ctx, uint64(idx), service)
 	if err != nil {
 		c.sendError(fmt.Sprintf("fail to get service with idx %d: %v", idx, err), inputMsg.Chat.ID)
 		return
 	}
-	raiting.UpdatedTs = time.Unix(int64(inputMsg.Date), 0)
+	service.UpdatedTs = time.Unix(int64(inputMsg.Date), 0)
 
 	msg := tgbotapi.NewMessage(
 		inputMsg.Chat.ID,
-		fmt.Sprintf("edit service idx: %d\n%s", idx, raiting.String()),
+		fmt.Sprintf("edit service idx: %d\n%s", idx, service.String()),
 	)
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 }

@@ -1,6 +1,7 @@
 package theService
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -16,8 +17,9 @@ func (c *RatingTheServiceCommander) Get(inputMsg *tgbotapi.Message) {
 		c.sendError("example: /get__raiting__theservice 0", inputMsg.Chat.ID)
 		return
 	}
-
-	rating, err := c.service.Describe(uint64(idx))
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	rating, err := c.rtgService.Describe(ctx, uint64(idx))
 	if err != nil {
 		c.sendError(fmt.Sprintf("fail to get rating with idx %d: %v", idx, err), inputMsg.Chat.ID)
 		return

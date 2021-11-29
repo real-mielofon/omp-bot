@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package ozonmp.rtg_service_api.v1;
+
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ozonmp/rtg-service-api/pkg/rtg-service-api;rtg_service_api";
+
+// RtgServiceApiService - Service for working with services
+service RtgServiceApiService {
+  // CreateService
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse) {
+    option (google.api.http) = {
+      post: "/CreateService"
+      body: "*"
+    };
+  }
+
+  // UpdateService
+  rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse) {
+    option (google.api.http) = {
+      post: "/UpdateService"
+      body: "*"
+    };
+  }
+
+  // DescribeService
+  rpc DescribeService(DescribeServiceRequest) returns (DescribeServiceResponse) {
+    option (google.api.http) = {
+      get: "/DescribeService"
+    };
+  }
+
+  // ListServices
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
+    option (google.api.http) = {
+      get: "/ListServices"
+    };
+  }
+
+  // RemoveService
+  rpc RemoveService(RemoveServiceRequest) returns (RemoveServiceResponse) {
+    option (google.api.http) = {
+      delete: "/RemoveService"
+    };
+  }
+}
+
+message Service {
+  uint64 id  = 1;
+  uint64 value = 2;
+  google.protobuf.Timestamp updated_ts = 3;
+  uint64 reviews_count = 4;
+}
+
+message CreateServiceRequest {
+  uint64 value = 1;
+  uint64 reviews_count = 2;
+}
+
+message CreateServiceResponse {
+  Service service = 1;
+}
+
+message UpdateServiceRequest {
+  uint64 id  = 1 [(validate.rules).uint64.gt = 0];
+  Service service = 2;
+}
+
+message UpdateServiceResponse {
+}
+
+message DescribeServiceRequest {
+  uint64 id  = 1 [(validate.rules).uint64.gt = 0];
+}
+
+message DescribeServiceResponse {
+  Service service = 1;
+}
+
+message ListServicesRequest {
+
+}
+
+message ListServicesResponse {
+  repeated Service services = 1;
+}
+
+message RemoveServiceRequest {
+  uint64 id  = 1 [(validate.rules).uint64.gt = 0];
+}
+
+message RemoveServiceResponse {
+  bool found = 1;
+}
+
