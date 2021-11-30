@@ -1,8 +1,10 @@
 package router
 
 import (
+	"context"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 	"github.com/real-mielofon/omp-bot/internal/service/raiting"
-	"log"
+
 	"runtime/debug"
 	"time"
 
@@ -12,8 +14,8 @@ import (
 )
 
 type Commander interface {
-	HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath)
-	HandleCommand(callback *tgbotapi.Message, commandPath path.CommandPath)
+	HandleCallback(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath)
+	HandleCommand(ctx context.Context, callback *tgbotapi.Message, commandPath path.CommandPath)
 }
 
 type Router struct {
@@ -88,31 +90,33 @@ func NewRouter(
 	}
 }
 
-func (c *Router) HandleUpdate(update tgbotapi.Update) {
+func (c *Router) HandleUpdate(ctx context.Context, update tgbotapi.Update) {
 	defer func() {
 		if panicValue := recover(); panicValue != nil {
-			log.Printf("recovered from panic: %v\n%v", panicValue, string(debug.Stack()))
+			logger.InfoKV(ctx, "recovered from panic",
+				"panicValue", panicValue,
+				"stack", string(debug.Stack()))
 		}
 	}()
 
 	switch {
 	case update.CallbackQuery != nil:
-		c.handleCallback(update.CallbackQuery)
+		c.handleCallback(ctx, update.CallbackQuery)
 	case update.Message != nil:
-		c.handleMessage(update.Message)
+		c.handleMessage(ctx, update.Message)
 	}
 }
 
-func (c *Router) handleCallback(callback *tgbotapi.CallbackQuery) {
+func (c *Router) handleCallback(ctx context.Context, callback *tgbotapi.CallbackQuery) {
 	callbackPath, err := path.ParseCallback(callback.Data)
 	if err != nil {
-		log.Printf("Router.handleCallback: error parsing callback data `%s` - %v", callback.Data, err)
+		logger.ErrorKV(ctx, "Router.handleCallback: error parsing callback data", "callback.Data", callback.Data, "err", err)
 		return
 	}
 
 	switch callbackPath.Domain {
 	case "demo":
-		c.demoCommander.HandleCallback(callback, callbackPath)
+		c.demoCommander.HandleCallback(ctx, callback, callbackPath)
 	case "user":
 		break
 	case "access":
@@ -152,7 +156,7 @@ func (c *Router) handleCallback(callback *tgbotapi.CallbackQuery) {
 	case "estate":
 		break
 	case "raiting":
-		c.raitingCommander.HandleCallback(callback, callbackPath)
+		c.raitingCommander.HandleCallback(ctx, callback, callbackPath)
 	case "security":
 		break
 	case "cinema":
@@ -164,26 +168,28 @@ func (c *Router) handleCallback(callback *tgbotapi.CallbackQuery) {
 	case "education":
 		break
 	default:
-		log.Printf("Router.handleCallback: unknown domain - %s", callbackPath.Domain)
+		logger.InfoKV(ctx, "Router.handleCallback: unknown domain", "domain", callbackPath.Domain)
 	}
 }
 
-func (c *Router) handleMessage(msg *tgbotapi.Message) {
+func (c *Router) handleMessage(ctx context.Context, msg *tgbotapi.Message) {
 	if !msg.IsCommand() {
-		c.showCommandFormat(msg)
+		c.showCommandFormat(ctx, msg)
 
 		return
 	}
 
 	commandPath, err := path.ParseCommand(msg.Command())
 	if err != nil {
-		log.Printf("Router.handleCallback: error parsing callback data `%s` - %v", msg.Command(), err)
+		logger.ErrorKV(ctx, "Router.handleCallback: error parsing callback data",
+			"command", msg.Command(),
+			"err", err)
 		return
 	}
 
 	switch commandPath.Domain {
 	case "demo":
-		c.demoCommander.HandleCommand(msg, commandPath)
+		c.demoCommander.HandleCommand(ctx, msg, commandPath)
 	case "user":
 		break
 	case "access":
@@ -223,7 +229,7 @@ func (c *Router) handleMessage(msg *tgbotapi.Message) {
 	case "estate":
 		break
 	case "raiting":
-		c.raitingCommander.HandleCommand(msg, commandPath)
+		c.raitingCommander.HandleCommand(ctx, msg, commandPath)
 	case "security":
 		break
 	case "cinema":
@@ -235,15 +241,15 @@ func (c *Router) handleMessage(msg *tgbotapi.Message) {
 	case "education":
 		break
 	default:
-		log.Printf("Router.handleCallback: unknown domain - %s", commandPath.Domain)
+		logger.InfoKV(ctx, "Router.handleCallback: unknown domain", "domain", commandPath.Domain)
 	}
 }
 
-func (c *Router) showCommandFormat(inputMessage *tgbotapi.Message) {
+func (c *Router) showCommandFormat(ctx context.Context, inputMessage *tgbotapi.Message) {
 	outputMsg := tgbotapi.NewMessage(inputMessage.Chat.ID, "Command format: /{command}__{domain}__{subdomain}")
 
 	_, err := c.bot.Send(outputMsg)
 	if err != nil {
-		log.Printf("Router.showCommandFormat: error sending reply message to chat - %v", err)
+		logger.ErrorKV(ctx, "Router.showCommandFormat: error sending reply message to chat", "err", err)
 	}
 }

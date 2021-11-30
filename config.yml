@@ -1,0 +1,15 @@
+project:
+  name: Ozon Code Platform Service API
+  debug: true
+  environment: development
+  servicename: omp-bot
+
+rtg_service:
+  address: "127.0.0.1:8082"
+rtg_facade:
+  address: "127.0.0.1:8085"
+timeout: 30s
+
+retry:
+  count: 5
+  delay: 10s

@@ -1,8 +1,9 @@
 package theService
 
 import (
+	"context"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 	"github.com/real-mielofon/omp-bot/internal/service/raiting"
-	"log"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -28,36 +29,36 @@ func NewTheServiceCommander(
 	}
 }
 
-func (c *RatingTheServiceCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingTheServiceCommander) HandleCallback(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	switch callbackPath.CallbackName {
 	case "list":
-		c.CallbackList(callback, callbackPath)
+		c.CallbackList(ctx, callback, callbackPath)
 	default:
-		log.Printf("RatingTheServiceCommander.HandleCallback: unknown callback name: %s", callbackPath.CallbackName)
+		logger.InfoKV(ctx, "RatingTheServiceCommander.HandleCallback: unknown callback name", "CallbackName", callbackPath.CallbackName)
 	}
 }
 
-func (c *RatingTheServiceCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
+func (c *RatingTheServiceCommander) HandleCommand(ctx context.Context, msg *tgbotapi.Message, commandPath path.CommandPath) {
 	switch commandPath.CommandName {
 	case "help":
-		c.Help(msg)
+		c.Help(ctx, msg)
 	case "list":
-		c.List(msg)
+		c.List(ctx, msg)
 	case "get":
-		c.Get(msg)
+		c.Get(ctx, msg)
 	case "delete":
-		c.Delete(msg)
+		c.Delete(ctx, msg)
 	case "edit":
-		c.Edit(msg)
+		c.Edit(ctx, msg)
 	case "new":
-		c.New(msg)
+		c.New(ctx, msg)
 	default:
-		c.Default(msg)
+		c.Default(ctx, msg)
 	}
 }
 
-func (c *RatingTheServiceCommander) sendError(str string, inputMessageID int64) {
-	log.Println(str)
+func (c *RatingTheServiceCommander) sendError(ctx context.Context, str string, inputMessageID int64) {
+	logger.InfoKV(ctx, "Error", "str", str)
 	msg := tgbotapi.NewMessage(
 		inputMessageID,
 		str,
@@ -65,7 +66,7 @@ func (c *RatingTheServiceCommander) sendError(str string, inputMessageID int64) 
 
 	_, err := c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 }

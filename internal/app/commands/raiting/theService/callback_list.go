@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/real-mielofon/omp-bot/internal/app/path"
@@ -16,11 +16,11 @@ type CallbackListData struct {
 
 const itemsOnList = 10
 
-func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingTheServiceCommander) CallbackList(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	parsedData := CallbackListData{}
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
-		log.Printf("error json.Unmarshal %+v", parsedData)
+		logger.ErrorKV(ctx, "error json.Unmarshal ", "err", err, "parsedData", parsedData)
 		return
 	}
 
@@ -29,7 +29,7 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	ratings, err := c.rtgService.List(ctx, parsedData.Offset, itemsOnList)
 	if err != nil {
-		c.sendError(fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
+		c.sendError(ctx, fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
 		return
 	}
 
@@ -82,14 +82,14 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 	_, err = c.bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: callback.ID,
 	})
 	if err != nil {
-		log.Printf("error AnswerCallbackQuery %s", err)
+		logger.ErrorKV(ctx, "error AnswerCallbackQuery", "err", err)
 		return
 	}
 }
