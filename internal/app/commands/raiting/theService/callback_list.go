@@ -1,12 +1,13 @@
 package theService
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type CallbackListData struct {
@@ -15,17 +16,20 @@ type CallbackListData struct {
 
 const itemsOnList = 10
 
-func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingTheServiceCommander) CallbackList(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	parsedData := CallbackListData{}
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
-		log.Printf("error json.Unmarshal %+v", parsedData)
+		logger.ErrorKV(ctx, "error json.Unmarshal ", "err", err, "parsedData", parsedData)
 		return
 	}
 
-	ratings, err := c.service.List(parsedData.Offset, itemsOnList)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+
+	ratings, err := c.rtgService.List(ctx, parsedData.Offset, itemsOnList)
 	if err != nil {
-		c.sendError(fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
+		c.sendError(ctx, fmt.Sprintf("error json.Unmarshal %+v", parsedData), callback.Message.Chat.ID)
 		return
 	}
 
@@ -36,8 +40,11 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	msg := tgbotapi.NewMessage(callback.Message.Chat.ID, outputMsgText)
 	var buttons []tgbotapi.InlineKeyboardButton
+	ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
 	if int(parsedData.Offset)-itemsOnList >= 0 {
-		if _, err := c.service.Describe(parsedData.Offset - itemsOnList); err == nil {
+
+		if _, err := c.rtgService.Describe(ctx, parsedData.Offset-itemsOnList); err == nil {
 			// Add Prev buttun
 			serializedData, _ := json.Marshal(CallbackListData{
 				Offset: parsedData.Offset - itemsOnList,
@@ -52,7 +59,7 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 			buttons = append(buttons, tgbotapi.NewInlineKeyboardButtonData("Prev page", callbackPath.String()))
 		}
 	}
-	if _, err := c.service.Describe(parsedData.Offset + itemsOnList); err == nil {
+	if _, err := c.rtgService.Describe(ctx, parsedData.Offset+itemsOnList); err == nil {
 		// Add Next buttun
 		serializedData, _ := json.Marshal(CallbackListData{
 			Offset: parsedData.Offset + itemsOnList,
@@ -75,14 +82,14 @@ func (c *RatingTheServiceCommander) CallbackList(callback *tgbotapi.CallbackQuer
 
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 	_, err = c.bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: callback.ID,
 	})
 	if err != nil {
-		log.Printf("error AnswerCallbackQuery %s", err)
+		logger.ErrorKV(ctx, "error AnswerCallbackQuery", "err", err)
 		return
 	}
 }

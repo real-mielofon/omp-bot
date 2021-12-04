@@ -1,11 +1,12 @@
 package theService
 
 import (
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"log"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 )
 
-func (c *RatingTheServiceCommander) Help(inputMsg *tgbotapi.Message) {
+func (c *RatingTheServiceCommander) Help(ctx context.Context, inputMsg *tgbotapi.Message) {
 	msg := tgbotapi.NewMessage(inputMsg.Chat.ID,
 		"/help__raiting__theservice - help\n"+
 			"/list__raiting__theservice - list products\n"+
@@ -16,7 +17,7 @@ func (c *RatingTheServiceCommander) Help(inputMsg *tgbotapi.Message) {
 
 	_, err := c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 }

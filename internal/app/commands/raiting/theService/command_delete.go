@@ -1,30 +1,37 @@
 package theService
 
 import (
+	"context"
 	"fmt"
-	"log"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
+
 	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (c *RatingTheServiceCommander) Delete(inputMsg *tgbotapi.Message) {
+func (c *RatingTheServiceCommander) Delete(ctx context.Context, inputMsg *tgbotapi.Message) {
 	args := inputMsg.CommandArguments()
 
 	idx, err := strconv.Atoi(args)
 	if err != nil {
-		c.sendError("example: /delete__raiting__theservice 0", inputMsg.Chat.ID)
+		c.sendError(ctx, "example: /delete__raiting__theservice 0", inputMsg.Chat.ID)
 		return
 	}
 
-	rating, err := c.service.Describe(uint64(idx))
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	rating, err := c.rtgService.Describe(ctx, uint64(idx))
 	if err != nil {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
+		c.sendError(ctx, fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 		return
 	}
-	result, err := c.service.Remove(uint64(idx))
+
+	ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	result, err := c.rtgService.Remove(ctx, uint64(idx))
 	if !result {
-		c.sendError(fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
+		c.sendError(ctx, fmt.Sprintf("fail to delete product: %v", err), inputMsg.Chat.ID)
 	}
 	msg := tgbotapi.NewMessage(
 		inputMsg.Chat.ID,
@@ -32,7 +39,7 @@ func (c *RatingTheServiceCommander) Delete(inputMsg *tgbotapi.Message) {
 	)
 	_, err = c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 }

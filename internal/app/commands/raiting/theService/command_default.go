@@ -1,19 +1,19 @@
 package theService
 
 import (
-	"log"
-
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
 )
 
-func (c *RatingTheServiceCommander) Default(inputMsg *tgbotapi.Message) {
-	log.Printf("[%s] %s", inputMsg.From.UserName, inputMsg.Text)
+func (c *RatingTheServiceCommander) Default(ctx context.Context, inputMsg *tgbotapi.Message) {
+	logger.InfoKV(ctx, "default", "UserName", inputMsg.From.UserName, "Text", inputMsg.Text)
 
 	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "You wrote: "+inputMsg.Text)
 
 	_, err := c.bot.Send(msg)
 	if err != nil {
-		log.Printf("error send message %s", err)
+		logger.ErrorKV(ctx, "error send message", "err", err)
 		return
 	}
 }

@@ -1,17 +1,21 @@
 package raiting
 
 import (
-	"log"
+	"context"
+	"github.com/real-mielofon/omp-bot/internal/pkg/logger"
+	"github.com/real-mielofon/omp-bot/internal/service/raiting"
 
-	"github.com/ozonmp/omp-bot/internal/app/commands/raiting/theService"
+	"time"
+
+	"github.com/real-mielofon/omp-bot/internal/app/commands/raiting/theService"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ozonmp/omp-bot/internal/app/path"
+	"github.com/real-mielofon/omp-bot/internal/app/path"
 )
 
 type Commander interface {
-	HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath)
-	HandleCommand(message *tgbotapi.Message, commandPath path.CommandPath)
+	HandleCallback(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath)
+	HandleCommand(ctx context.Context, message *tgbotapi.Message, commandPath path.CommandPath)
 }
 
 type RatingCommander struct {
@@ -21,27 +25,29 @@ type RatingCommander struct {
 
 func NewRaitingCommander(
 	bot *tgbotapi.BotAPI,
+	rtgService raiting.TheServiceService,
+	timeout time.Duration,
 ) *RatingCommander {
 	return &RatingCommander{
 		bot:              bot,
-		serviceCommander: theService.NewTheServiceCommander(bot),
+		serviceCommander: theService.NewTheServiceCommander(bot, rtgService, timeout),
 	}
 }
 
-func (c *RatingCommander) HandleCallback(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
+func (c *RatingCommander) HandleCallback(ctx context.Context, callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
 	switch callbackPath.Subdomain {
 	case "service":
-		c.serviceCommander.HandleCallback(callback, callbackPath)
+		c.serviceCommander.HandleCallback(ctx, callback, callbackPath)
 	default:
-		log.Printf("DemoCommander.HandleCallback: unknown subdomain - %s", callbackPath.Subdomain)
+		logger.InfoKV(ctx, "DemoCommander.HandleCallback: unknown subdomain", "Subdomain", callbackPath.Subdomain)
 	}
 }
 
-func (c *RatingCommander) HandleCommand(msg *tgbotapi.Message, commandPath path.CommandPath) {
+func (c *RatingCommander) HandleCommand(ctx context.Context, msg *tgbotapi.Message, commandPath path.CommandPath) {
 	switch commandPath.Subdomain {
 	case "theservice":
-		c.serviceCommander.HandleCommand(msg, commandPath)
+		c.serviceCommander.HandleCommand(ctx, msg, commandPath)
 	default:
-		log.Printf("DemoCommander.HandleCommand: unknown subdomain - %s", commandPath.Subdomain)
+		logger.InfoKV(ctx, "DemoCommander.HandleCommand: unknown subdomain", "Subdomain", commandPath.Subdomain)
 	}
 }
